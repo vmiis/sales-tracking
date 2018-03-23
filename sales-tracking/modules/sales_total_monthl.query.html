@@ -1,12 +1,13 @@
 <section>
-    <div id=toolbar__ID>
-        <a id=back__ID>Back</a>
-        <a id=new__ID>New</a>
-        <a id=save__ID>Save</a>
-        <select id=YY__ID type=select></select>
-        <a id=query__ID >Query</a>
-        <a id=export__ID >Export</a>
-    	<span class=tab__ID></span>Sales total monthly
+    <div id=toolbar__ID class="navbar navbar-default">
+        <form class="form-inline">
+            <button type=button class='btn btn-secondary' id=new__ID>New</button>
+            <button type=button class='btn btn-secondary' id=save__ID>Save</button>
+            <select id=YY__ID type=select class="form-control" style='display:inline-block;width:auto;'></select>
+            <button type=button class='btn btn-secondary' id=query__ID >Query</button>
+            <button type=button class='btn btn-secondary' id=export__ID >Export</button>
+        	<span class=tab__ID></span>Sales total monthly
+        </form>
         <span id=elapsed__ID style='float:right'></span>
     </div>
     <table id=grid__ID></table>
@@ -14,12 +15,13 @@
 <script>
     function F__ID(){
         //-------------------------------------
-        VmInclude:__BASE__/vmiis/Common-Code/grid/grid.js
-        VmInclude:__BASE__/vmiis/Common-Code/style/ease-in-out.js
+        VmInclude:__COMPONENT__/grid/grid.v3.js
         //-------------------------------------
         _fields="Year,Month,Amount,_Update,Update_Date,Updated_by";
         _fields+=",Submit Date|DateTime,Submitted by|Author";
         _fields_e=_fields.replace(',_Update','');
+        //-------------------------------------
+        var prefix=_mlist[$vm.vm['__ID'].name].prefix;
         //-------------------------------------
         //number dropdown
         var $List=$('#YY__ID');
@@ -35,7 +37,7 @@
         _cell_render=function(records,I,field,td,set_value,source){
             switch(field){
                 case 'Order_Date':
-                    VmInclude:__BASE__/vmiis/Common-Code/grid/field_date.js
+                    VmInclude:__COMPONENT__/grid/field_date.js
                     break;
                 case 'Year':
                     var y=new Date().getFullYear();
@@ -52,7 +54,7 @@
                             <option>"+(y-9)+"</option>\
                         </select>\
                     ";
-                    VmInclude:__BASE__/vmiis/Common-Code/grid/field_select.js
+                    VmInclude:__COMPONENT__/grid/field_select.js
                     break;
                 case 'Month':
                     var y=new Date().getFullYear();
@@ -71,7 +73,7 @@
                             <option>December</option>\
                         </select>\
                     ";
-                    VmInclude:__BASE__/vmiis/Common-Code/grid/field_select.js
+                    VmInclude:__COMPONENT__/grid/field_select.js
                     break;
                 case 'Amount':
                     td.css('text-align','right');
@@ -79,6 +81,7 @@
                     td.html(parseFloat(records[I][field]).toFixed(2) );
                     break;
                 case '_Update':
+                    records[I].vm_custom[field]=true;
                     td.html("<u style='cursor:pointer;color:#888'>Update</u>");
                     td.find('u').on('click',function(){
                         update_amount(I);
@@ -114,7 +117,7 @@
             if(year!==undefined && month!==undefined){
                 var items=['January','February','March','April','May','June','July','August','September','October','November','December'];
                 month=(items.indexOf(month)+1).toString();
-                var pid=$vm.module_list['sales'].table_id;
+                var pid=$vm.module_list[prefix+'sales'].table_id;
                 var sql="\
                     with tb as (select Amount=V1 from [TABLE-"+pid+"] where DatePart(yy,DT1)=@I1 and DatePart(mm,DT1)=@I2) \
                     select Amount=Sum(Amount) from tb\
@@ -142,5 +145,14 @@
     }
 </script>
 <style>
-    VmInclude:__BASE__/vmiis/Common-Code/grid/grid.css
+    VmInclude:__COMPONENT__/grid/grid.v3.css
+    #toolbar__ID{
+		background-color:#ccc;
+		padding:5px;
+		margin-bottom:0px;
+		overflow:hidden
+	}
+    #toolbar__ID *{
+		margin-right:3px;
+	}
 </style>
